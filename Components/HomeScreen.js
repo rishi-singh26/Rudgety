@@ -4,7 +4,8 @@ import {
   View,
   Dimensions,
   TouchableOpacity,
-  StatusBar
+  StatusBar,
+  AsyncStorage
 } from "react-native";
 import { SocialIcon, Button } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -13,6 +14,14 @@ import styles from "../Shared/Styles";
 import { findTotal, retriveData, saveData } from "../Shared/functions";
 import ActionSheet from "react-native-actionsheet";
 import { OutlinedTextField } from "react-native-material-textfield";
+
+var today = new Date();
+var date =
+  today.getDate() +
+  "/" +
+  parseInt(today.getMonth() + 1) +
+  "/" +
+  today.getFullYear();
 
 const IS_IPHONE_X = SCREEN_HEIGHT === 812 || SCREEN_HEIGHT === 896;
 const STATUS_BAR_HEIGHT = Platform.OS === "ios" ? (IS_IPHONE_X ? 44 : 20) : 20;
@@ -31,167 +40,70 @@ class HomeScreen extends Component {
     super(props);
     this.state = {
       showInput: false,
-      submissionTypeButtonTitle: "↑↓",
+      submissionTypeButtonTitle: "↓",
+      submissionType: true, //this manages the income or expence being submitted, true is income and false is expence
+      submissionTypeButtonColor: "#16a10a",
       expence: [
         {
-          id: 1,
-          value: "300",
-          date: "12/02/2020",
-          desc: "Just spent it.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
           id: 2,
-          value: "230",
-          date: "17/02/2020",
-          desc: "Not this time.",
+          value: "12",
+          date: "20/02/2020",
+          desc: "HHhahskmdf",
           type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 3,
-          value: "723",
-          date: "22/02/2020",
-          desc: "Yup this was tough.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 4,
-          value: "426",
-          date: "28/02/2020",
-          desc: "Just spent it.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
+          spentOn: "Foodsmdnf"
         }
       ],
       income: [
         {
           id: 1,
-          value: "1200",
-          date: "12/02/2020",
-          desc: "Just got it.",
+          value: "12",
+          date: "20/02/2020",
+          desc: "HHhah",
           type: "#28a612",
-          spentOn: "Khana"
-        },
-        {
-          id: 2,
-          value: "3000",
-          date: "22/02/2020",
-          desc: "Not this time.",
-          type: "#28a612",
-          spentOn: "Khana"
+          spentOn: "Food"
         }
       ],
       fullData: [
         {
           id: 1,
-          value: "1200",
-          date: "12/02/2020",
-          desc: "Just got it.",
+          value: "12",
+          date: "20/02/2020",
+          desc: "HHhah",
           type: "#28a612",
-          spentOn: "Khana"
+          spentOn: "Food"
         },
         {
           id: 2,
-          value: "300",
-          date: "12/02/2020",
-          desc: "Just spent it.",
+          value: "12",
+          date: "20/02/2020",
+          desc: "HHhahskmdf",
           type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 3,
-          value: "230",
-          date: "17/02/2020",
-          desc: "Not this time.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 4,
-          value: "723",
-          date: "22/02/2020",
-          desc: "Yup this was tough.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 5,
-          value: "3000",
-          date: "22/02/2020",
-          desc: "Not this time.",
-          type: "#28a612",
-          spentOn: "Khana"
-        },
-        {
-          id: 6,
-          value: "426",
-          date: "28/02/2020",
-          desc: "Just spent it.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 7,
-          value: "426",
-          date: "28/02/2020",
-          desc: "Just spent it.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 8,
-          value: "426",
-          date: "28/02/2020",
-          desc: "Just spent it.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 9,
-          value: "426",
-          date: "28/02/2020",
-          desc: "Just spent it.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 10,
-          value: "426",
-          date: "28/02/2020",
-          desc: "Just spent it.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 11,
-          value: "426",
-          date: "28/02/2020",
-          desc: "Just spent it.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 12,
-          value: "426",
-          date: "28/02/2020",
-          desc: "Just spent it.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
-        },
-        {
-          id: 13,
-          value: "426",
-          date: "28/02/2020",
-          desc: "Just spent it.",
-          type: "#ff2b2b",
-          spentOn: "Khana"
+          spentOn: "Foodsmdnf"
         }
       ]
     };
   }
+
+  componentDidMount() {
+    this.retriveData();
+  }
+
+  retriveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("fullDataKey2");
+      if (value !== null) {
+        // We have data!!
+        var retrivedData = JSON.parse(value);
+        console.log(retrivedData, "Data retrived");
+        // this.setState({ fullData: retrivedData });
+        // this.setState({ fullData: this.state.fullData });
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log("Error in retriving saved data");
+      return "error";
+    }
+  };
 
   showActionSheet = () => {
     this.ActionSheet.show();
@@ -216,7 +128,6 @@ class HomeScreen extends Component {
             justifyContent: "flex-start"
           }}
         >
-          {/* <SocialIcon type="money" light raised={true} /> */}
           <Text
             style={{
               color: "#fff",
@@ -358,7 +269,55 @@ class HomeScreen extends Component {
   fieldRef1 = React.createRef();
   fieldRef2 = React.createRef();
 
-  onSubmit = () => {};
+  onSubmit = () => {
+    var currentFullData = this.state.fullData;
+    var currentExpenceData = this.state.expence;
+    var currentIncomeData = this.state.income;
+
+    let { current: field } = this.fieldRef;
+    let { current: field2 } = this.fieldRef1;
+    let { current: field3 } = this.fieldRef2;
+
+    var typeOfData;
+    if (this.state.submissionType) {
+      typeOfData = "#28a612";
+    } else {
+      typeOfData = "#ff2b2b";
+    }
+
+    var newData = {
+      id:
+        Math.floor(Math.random() * 100 + 1) +
+        Math.floor(Math.random() * 1000 + 1) +
+        Math.floor(Math.random() * 100 + 1),
+      value: field.value(),
+      date: date,
+      desc: field3.value(),
+      type: typeOfData,
+      spentOn: field2.value()
+    };
+    var newFullData = currentFullData.concat(newData);
+    var newtExpenceData = currentExpenceData.concat(newData);
+    var newIncomeData = currentIncomeData.concat(newData);
+
+    var currentBalance = findTotal(newIncomeData) - findTotal(newtExpenceData);
+
+    if (currentBalance > 0) {
+      this.setState({ fullData: newFullData });
+    }
+    saveData("fullDataKey2", JSON.stringify(newFullData));
+
+    if (this.state.submissionType) {
+      this.setState({ income: newIncomeData });
+    } else {
+      if (currentBalance > 0) {
+        this.setState({ expence: newtExpenceData });
+      } else {
+        alert("Your balance is 0.");
+      }
+    }
+    this.setState({ showInput: !this.state.showInput });
+  };
 
   renderContent = () => {
     return (
@@ -424,48 +383,65 @@ class HomeScreen extends Component {
           >
             <Text>Make a new entry here.</Text>
             <Text></Text>
-            {/* <View style={{ flex: 1, flexDirection: "row" }}> */}
-            {/* <View> */}
-            <OutlinedTextField
-              label="Enter counter name"
-              keyboardType="number-pad"
-              title="Pressing the enter key on the keyboard will create this counter."
-              //   onSubmitEditing={this.onSubmit}
-              ref={this.fieldRef}
-              autoFocus={true}
-            />
-            {/* </View> */}
-            {/* <View> */}
+            <View style={{ flex: 1, flexDirection: "row" }}>
+              <View style={{ flex: 3 }}>
+                <OutlinedTextField
+                  label="Enter value"
+                  keyboardType="number-pad"
+                  //   onSubmitEditing={this.onSubmit}
+                  ref={this.fieldRef}
+                  autoFocus={true}
+                />
+              </View>
+              <View style={{ flex: 1, marginLeft: 5 }}>
+                <Button
+                  title={this.state.submissionTypeButtonTitle}
+                  onPress={() => {
+                    if (this.state.submissionType) {
+                      this.setState({
+                        submissionType: !this.state.submissionType,
+                        submissionTypeButtonColor: "#ff3b3b",
+                        submissionTypeButtonTitle: "↑"
+                      });
+                    } else {
+                      this.setState({
+                        submissionType: !this.state.submissionType,
+                        submissionTypeButtonColor: "#16a10a",
+                        submissionTypeButtonTitle: "↓"
+                      });
+                    }
+                  }}
+                  buttonStyle={{
+                    backgroundColor: this.state.submissionTypeButtonColor
+                  }}
+                  titleStyle={{ fontSize: 26, fontWeight: "bold" }}
+                />
+              </View>
+            </View>
             <Text></Text>
-            <Button
-              title={this.state.submissionTypeButtonTitle}
-              onPress={this.onSubmit}
-            />
-            {/* </View> */}
-            {/* </View> */}
-            <Text></Text>
             <OutlinedTextField
-              label="Enter counter name"
+              label="Enter name"
               keyboardType="default"
-              title="Pressing the enter key on the keyboard will create this counter."
+              title="Food, Shopping, Vacation."
               //   onSubmitEditing={this.onSubmit}
               ref={this.fieldRef1}
               //   autoFocus={true}
             />
             <Text></Text>
             <OutlinedTextField
-              label="Enter counter name"
+              label="Enter Description"
               keyboardType="default"
-              title="Pressing the enter key on the keyboard will create this counter."
+              title="Went to the grocery shop."
               //   onSubmitEditing={this.onSubmit}
               ref={this.fieldRef2}
               //   autoFocus={true}
             />
             <Text></Text>
             <Button title="Submit" onPress={this.onSubmit} />
+            <Text style={{ minHeight: 400 }}></Text>
           </View>
         )}
-        <View>{renderFullData}</View>
+        {!this.state.showInput && <View>{renderFullData}</View>}
       </View>
     );
   };
@@ -475,39 +451,43 @@ class HomeScreen extends Component {
       .slice(0)
       .reverse()
       .map((item, index) => {
-        return (
-          <View
-            key={item.id}
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              backgroundColor: "#fff",
-              //   marginBottom: 3,
-              paddingTop: 10,
-              paddingBottom: 10,
-              paddingLeft: 20
-            }}
-          >
-            <View style={{ flex: 5, flexDirection: "column" }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                {item.spentOn}
-              </Text>
-              <Text>{item.desc}</Text>
-            </View>
-            <View style={{ flex: 1, paddingTop: 10 }}>
-              {item.type == "#28a612" && (
-                <Text style={{ color: item.type, fontSize: 17 }}>
-                  + {item.value}
+        if (this.state.fullData.length > 0) {
+          return (
+            <View
+              key={item.id}
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                backgroundColor: "#fff",
+                //   marginBottom: 3,
+                paddingTop: 10,
+                paddingBottom: 10,
+                paddingLeft: 20
+              }}
+            >
+              <View style={{ flex: 5, flexDirection: "column" }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                  {item.spentOn}
                 </Text>
-              )}
-              {item.type == "#ff2b2b" && (
-                <Text style={{ color: item.type, fontSize: 17 }}>
-                  - {item.value}
-                </Text>
-              )}
+                <Text>{item.desc}</Text>
+              </View>
+              <View style={{ flex: 2, paddingTop: 10 }}>
+                {item.type == "#28a612" && (
+                  <Text style={{ color: item.type, fontSize: 17 }}>
+                    + {item.value}
+                  </Text>
+                )}
+                {item.type == "#ff2b2b" && (
+                  <Text style={{ color: item.type, fontSize: 17 }}>
+                    - {item.value}
+                  </Text>
+                )}
+              </View>
             </View>
-          </View>
-        );
+          );
+        } else {
+          return null;
+        }
       });
 
     return (

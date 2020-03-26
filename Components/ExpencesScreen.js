@@ -181,7 +181,7 @@ class ExpencesScreen extends Component {
               </Text>
               <Text>{item.desc}</Text>
             </View>
-            <View style={{ flex: 1, paddingTop: 10 }}>
+            <View style={{ flex: 2, paddingTop: 10 }}>
               <Text style={{ color: item.type, fontSize: 17 }}>
                 - {item.value}
               </Text>
