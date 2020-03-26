@@ -20,7 +20,13 @@ const NAV_BAR_HEIGHT = HEADER_HEIGHT - STATUS_BAR_HEIGHT;
 const SCREEN_HEIGHT = Math.round(Dimensions.get("window").height);
 const SCREEN_WIDTH = Math.round(Dimensions.get("window").width);
 
-const options = ["Mysore", "Mandya", "Bengaluru", "Bengaluru", "Cancel"];
+const options = [
+  "Edit the last entry",
+  "Expences",
+  "Income",
+  "About Developer",
+  "Cancel"
+];
 
 YellowBox.ignoreWarnings([
   "componentWillReceiveProps has been renamed, and is not recommended for use" // TODO: Remove when fixed
@@ -42,7 +48,7 @@ class ExpencesScreen extends Component {
       <View style={styles.navContainer}>
         <View style={styles.statusBar} />
         <View style={styles.navBar}>
-          <Text style={{ color: "#fff", fontSize: 20 }}>Expences</Text>
+          <Text style={{ color: "#fff", fontSize: 30 }}>Income</Text>
           <Text style={{ color: "#fff", fontSize: 30 }}>{findTotal(data)}</Text>
         </View>
       </View>
@@ -95,36 +101,6 @@ class ExpencesScreen extends Component {
           </TouchableOpacity>
         </View>
         {renderExpences}
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
-        <Text>Income</Text>
       </View>
     );
   };
@@ -148,8 +124,8 @@ class ExpencesScreen extends Component {
             alignItems: "center"
           }}
         >
-          <Text style={{ color: "#fff", fontSize: 20 }}>Income</Text>
-          <Text style={{ color: "#fff", fontSize: 40 }}>{findTotal(data)}</Text>
+          <Text style={{ color: "#fff", fontSize: 40 }}>Income</Text>
+          <Text style={{ color: "#fff", fontSize: 50 }}>{findTotal(data)}</Text>
         </View>
       </View>
     );

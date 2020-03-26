@@ -30,7 +30,13 @@ const NAV_BAR_HEIGHT = HEADER_HEIGHT - STATUS_BAR_HEIGHT;
 const SCREEN_HEIGHT = Math.round(Dimensions.get("window").height);
 const SCREEN_WIDTH = Math.round(Dimensions.get("window").width);
 // ↑↓
-const options = ["Mysore", "Mandya", "Bengaluru", "Bengaluru", "Cancel"];
+const options = [
+  "Edit the last entry",
+  "Expences",
+  "Income",
+  "About Developer",
+  "Cancel"
+];
 
 const images = {
   background: require("../assets/background.png") // Put your own image here
@@ -42,60 +48,73 @@ class HomeScreen extends Component {
       showInput: false,
       submissionTypeButtonTitle: "↓",
       submissionType: true, //this manages the income or expence being submitted, true is income and false is expence
-      submissionTypeButtonColor: "#16a10a",
-      expence: [
-        {
-          id: 2,
-          value: "12",
-          date: "20/02/2020",
-          desc: "HHhahskmdf",
-          type: "#ff2b2b",
-          spentOn: "Foodsmdnf"
-        }
-      ],
-      income: [
-        {
-          id: 1,
-          value: "12",
-          date: "20/02/2020",
-          desc: "HHhah",
-          type: "#28a612",
-          spentOn: "Food"
-        }
-      ],
-      fullData: [
-        {
-          id: 1,
-          value: "12",
-          date: "20/02/2020",
-          desc: "HHhah",
-          type: "#28a612",
-          spentOn: "Food"
-        },
-        {
-          id: 2,
-          value: "12",
-          date: "20/02/2020",
-          desc: "HHhahskmdf",
-          type: "#ff2b2b",
-          spentOn: "Foodsmdnf"
-        }
-      ]
+      submissionTypeButtonColor: "#16a10a", //this state manages the background color of the submission type button
+      addEntryIconName: "add",
+      expence: [],
+      income: [],
+      fullData: [],
+      valueErrorMess: "", //thishandles error message for value field of the add entry form
+      nameErrorMess: "", //thishandles error message for name field of the add entry form
+      descErrorMess: "", //thishandles error message for desc field of the add entry form
+      submitEntryBtnBackgroundColor: "#0088ff", //this state handles the background color for the submit button in the add entry from
+      submitEntryBtnTitle: "Submit"
     };
   }
 
   componentDidMount() {
-    this.retriveData();
+    this.retriveFullData();
+    this.retriveIncomeData();
+    this.retriveExpenceData();
   }
 
-  retriveData = async () => {
+  retriveFullData = async () => {
+    console.log("Retriving Data");
     try {
-      const value = await AsyncStorage.getItem("fullDataKey2");
+      const value = await AsyncStorage.getItem("fullDataKey3");
       if (value !== null) {
         // We have data!!
         var retrivedData = JSON.parse(value);
-        console.log(retrivedData, "Data retrived");
-        // this.setState({ fullData: retrivedData });
+        console.log(JSON.parse(retrivedData), "Full Data retrived");
+        console.log(typeof JSON.parse(retrivedData), "type of Data retrived");
+        this.setState({ fullData: JSON.parse(retrivedData) });
+        // this.setState({ fullData: this.state.fullData });
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log("Error in retriving saved data");
+      return "error";
+    }
+  };
+
+  retriveIncomeData = async () => {
+    console.log("Retriving Data");
+    try {
+      const value = await AsyncStorage.getItem("incomeDataKey3");
+      if (value !== null) {
+        // We have data!!
+        var retrivedData = JSON.parse(value);
+        console.log(JSON.parse(retrivedData), "Income Data retrived");
+        console.log(typeof JSON.parse(retrivedData), "type of Data retrived");
+        this.setState({ income: JSON.parse(retrivedData) });
+        // this.setState({ fullData: this.state.fullData });
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log("Error in retriving saved data");
+      return "error";
+    }
+  };
+
+  retriveExpenceData = async () => {
+    console.log("Retriving Data");
+    try {
+      const value = await AsyncStorage.getItem("expenceDataKey3");
+      if (value !== null) {
+        // We have data!!
+        var retrivedData = JSON.parse(value);
+        console.log(JSON.parse(retrivedData), "Expence Data retrived");
+        console.log(typeof JSON.parse(retrivedData), "type of Data retrived");
+        this.setState({ expence: JSON.parse(retrivedData) });
         // this.setState({ fullData: this.state.fullData });
       }
     } catch (error) {
@@ -110,67 +129,20 @@ class HomeScreen extends Component {
   };
 
   renderNavBar = () => (
-    <View style={[styles.navContainer, { paddingTop: 20 }]}>
-      <View
-        style={[
-          styles.statusBar,
-          {
-            flex: 1,
-            flexDirection: "row",
-            paddingTop: 20
-          }
-        ]}
-      >
-        <View
+    <View style={styles.navContainer}>
+      <View style={styles.statusBar} />
+      <View style={styles.navBar}>
+        <Text
           style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-start"
+            color: "#fff",
+            fontSize: 30
           }}
         >
-          <Text
-            style={{
-              color: "#fff",
-              fontSize: 25
-            }}
-          >
-            Cash: {findTotal(this.state.income) - findTotal(this.state.expence)}
-          </Text>
-        </View>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "flex-end",
-            alignItems: "center",
-            flexDirection: "row"
-          }}
-        >
-          <TouchableOpacity
-            style={{ margin: 10 }}
-            onPress={() => {
-              this.setState({ showInput: !this.state.showInput });
-            }}
-          >
-            <Icon name="add" size={27} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ margin: 10 }}
-            // onPress={() => {
-            //   this.props.navigation.navigate("Search", {
-            //     counterList: this.state.taskList,
-            //     deletedCounterList: this.state.deletedTaskList
-            //   });
-            // }}
-          >
-            <Icon name="search" size={25} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ margin: 10 }}
-            onPress={this.showActionSheet}
-          >
-            <Icon name="more-vert" size={25} color="#fff" />
-          </TouchableOpacity>
-        </View>
+          Cash: {findTotal(this.state.income) - findTotal(this.state.expence)}
+        </Text>
+        <TouchableOpacity style={{ margin: 10 }} onPress={this.showActionSheet}>
+          <Icon name="more-vert" size={25} color="#fff" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -278,45 +250,82 @@ class HomeScreen extends Component {
     let { current: field2 } = this.fieldRef1;
     let { current: field3 } = this.fieldRef2;
 
-    var typeOfData;
-    if (this.state.submissionType) {
-      typeOfData = "#28a612";
+    if (field.value().length === 0) {
+      this.setState({ valueErrorMess: "Please enter a value." });
     } else {
-      typeOfData = "#ff2b2b";
+      this.setState({ valueErrorMess: "" });
+    }
+    if (field2.value().length === 0) {
+      this.setState({ nameErrorMess: "Please enter a name." });
+    } else {
+      this.setState({ nameErrorMess: "" });
+    }
+    if (field3.value().length === 0) {
+      this.setState({ descErrorMess: "Please enter a description." });
+    } else {
+      this.setState({ descErrorMess: "" });
     }
 
-    var newData = {
-      id:
-        Math.floor(Math.random() * 100 + 1) +
-        Math.floor(Math.random() * 1000 + 1) +
-        Math.floor(Math.random() * 100 + 1),
-      value: field.value(),
-      date: date,
-      desc: field3.value(),
-      type: typeOfData,
-      spentOn: field2.value()
-    };
-    var newFullData = currentFullData.concat(newData);
-    var newtExpenceData = currentExpenceData.concat(newData);
-    var newIncomeData = currentIncomeData.concat(newData);
-
-    var currentBalance = findTotal(newIncomeData) - findTotal(newtExpenceData);
-
-    if (currentBalance > 0) {
-      this.setState({ fullData: newFullData });
-    }
-    saveData("fullDataKey2", JSON.stringify(newFullData));
-
-    if (this.state.submissionType) {
-      this.setState({ income: newIncomeData });
-    } else {
-      if (currentBalance > 0) {
-        this.setState({ expence: newtExpenceData });
+    if (
+      field.value().length > 0 &&
+      field2.value().length > 0 &&
+      field3.value().length > 0
+    ) {
+      var typeOfData;
+      if (this.state.submissionType) {
+        typeOfData = "#28a612";
       } else {
-        alert("Your balance is 0.");
+        typeOfData = "#ff2b2b";
       }
+
+      var newData = {
+        id:
+          Math.floor(Math.random() * 100 + 1) +
+          Math.floor(Math.random() * 1000 + 1) +
+          Math.floor(Math.random() * 100 + 1),
+        value: field.value(),
+        date: date,
+        desc: field3.value(),
+        type: typeOfData,
+        spentOn: field2.value()
+      };
+      var newFullData = currentFullData.concat(newData);
+      var newtExpenceData = currentExpenceData.concat(newData);
+      var newIncomeData = currentIncomeData.concat(newData);
+
+      var currentBalance =
+        findTotal(newIncomeData) - findTotal(newtExpenceData);
+
+      if (currentBalance > 0) {
+        this.setState({ fullData: newFullData });
+      }
+      saveData("fullDataKey3", JSON.stringify(newFullData));
+
+      if (this.state.submissionType) {
+        this.setState({ income: newIncomeData });
+        saveData("incomeDataKey3", JSON.stringify(newIncomeData));
+      } else {
+        if (currentBalance > 0) {
+          this.setState({ expence: newtExpenceData });
+          saveData("expenceDataKey3", JSON.stringify(newtExpenceData));
+        } else {
+          alert("Your balance is 0.");
+        }
+      }
+      this.setState({ showInput: !this.state.showInput });
+      if (this.state.addEntryIconName === "add") {
+        this.setState({ addEntryIconName: "undo" });
+      } else {
+        this.setState({ addEntryIconName: "add" });
+      }
+      this.setState({ submitEntryBtnBackgroundColor: "#0088ff" });
+    } else {
+      //   alert("Enter data correctly!!");
+      this.setState({
+        submitEntryBtnBackgroundColor: "#f00",
+        submitEntryBtnTitle: "Please enter the details and submit"
+      });
     }
-    this.setState({ showInput: !this.state.showInput });
   };
 
   renderContent = () => {
@@ -350,18 +359,29 @@ class HomeScreen extends Component {
             style={{ margin: 10 }}
             onPress={() => {
               this.setState({ showInput: !this.state.showInput });
+              if (this.state.addEntryIconName === "add") {
+                this.setState({ addEntryIconName: "undo" });
+              } else {
+                this.setState({ addEntryIconName: "add" });
+              }
+              this.setState({
+                valueErrorMess: "",
+                nameErrorMess: "",
+                descErrorMess: "",
+                submitEntryBtnBackgroundColor: "#0088ff",
+                submitEntryBtnTitle: "Submit"
+              });
             }}
           >
-            <Icon name="add" size={27} color="#000" />
+            <Icon name={this.state.addEntryIconName} size={27} color="#000" />
           </TouchableOpacity>
           <TouchableOpacity
             style={{ margin: 10 }}
-            // onPress={() => {
-            //   this.props.navigation.navigate("Search", {
-            //     counterList: this.state.taskList,
-            //     deletedCounterList: this.state.deletedTaskList
-            //   });
-            // }}
+            onPress={() => {
+              this.props.navigation.navigate("Search", {
+                data: this.state.fullData
+              });
+            }}
           >
             <Icon name="search" size={25} color="#000" />
           </TouchableOpacity>
@@ -391,6 +411,7 @@ class HomeScreen extends Component {
                   //   onSubmitEditing={this.onSubmit}
                   ref={this.fieldRef}
                   autoFocus={true}
+                  error={this.state.valueErrorMess}
                 />
               </View>
               <View style={{ flex: 1, marginLeft: 5 }}>
@@ -423,25 +444,31 @@ class HomeScreen extends Component {
               label="Enter name"
               keyboardType="default"
               title="Food, Shopping, Vacation."
-              //   onSubmitEditing={this.onSubmit}
               ref={this.fieldRef1}
-              //   autoFocus={true}
+              error={this.state.nameErrorMess}
             />
             <Text></Text>
             <OutlinedTextField
               label="Enter Description"
               keyboardType="default"
               title="Went to the grocery shop."
-              //   onSubmitEditing={this.onSubmit}
               ref={this.fieldRef2}
-              //   autoFocus={true}
+              error={this.state.descErrorMess}
             />
             <Text></Text>
-            <Button title="Submit" onPress={this.onSubmit} />
+            <Button
+              title={this.state.submitEntryBtnTitle}
+              onPress={this.onSubmit}
+              buttonStyle={{
+                backgroundColor: this.state.submitEntryBtnBackgroundColor
+              }}
+            />
             <Text style={{ minHeight: 400 }}></Text>
           </View>
         )}
-        {!this.state.showInput && <View>{renderFullData}</View>}
+        {!this.state.showInput && this.state.fullData.length > 0 && (
+          <View>{renderFullData}</View>
+        )}
       </View>
     );
   };
