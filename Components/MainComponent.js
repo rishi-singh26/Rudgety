@@ -10,7 +10,7 @@ import HomeScreen from "./HomeScreen";
 import ExpencesScreen from "./ExpencesScreen";
 import IncomeScreen from "./IncomeScreen";
 import Search from "./SearchScreen";
-
+import Details from "./EntrydetailScreen";
 const Stack = createStackNavigator();
 
 export default function MyStack() {
@@ -25,6 +25,7 @@ export default function MyStack() {
         <Stack.Screen name="Income" component={IncomeScreen} />
         <Stack.Screen name="Expences" component={ExpencesScreen} />
         <Stack.Screen name="Search" component={Search} />
+        <Stack.Screen name="Details" component={Details} />
       </Stack.Navigator>
     </NavigationContainer>
   );

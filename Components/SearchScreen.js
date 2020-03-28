@@ -7,8 +7,6 @@ import {
   TouchableOpacity,
   Dimensions
 } from "react-native";
-import { SearchBar, Icon } from "react-native-elements";
-import { searchEntry } from "../Shared/functions";
 import { OutlinedTextField } from "react-native-material-textfield";
 
 const SCREEN_HEIGHT = Math.round(Dimensions.get("window").height);
@@ -68,21 +66,45 @@ class Search extends Component {
             }}
           >
             <View style={{ flex: 5, flexDirection: "column" }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                {item.spentOn}
-              </Text>
-              <Text>{item.desc}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  this.props.navigation.navigate("Details", {
+                    data: item
+                  });
+                }}
+              >
+                <Text style={{ fontSize: 15, fontWeight: "bold" }}>
+                  {item.spentOn}
+                </Text>
+                <Text>{item.desc}</Text>
+              </TouchableOpacity>
             </View>
             <View style={{ flex: 2, paddingTop: 10 }}>
               {item.type == "#28a612" && (
-                <Text style={{ color: item.type, fontSize: 17 }}>
-                  + {item.value}
-                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.props.navigation.navigate("Details", {
+                      data: item
+                    });
+                  }}
+                >
+                  <Text style={{ color: item.type, fontSize: 15 }}>
+                    + {item.value}
+                  </Text>
+                </TouchableOpacity>
               )}
               {item.type == "#ff2b2b" && (
-                <Text style={{ color: item.type, fontSize: 17 }}>
-                  - {item.value}
-                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.props.navigation.navigate("Details", {
+                      data: item
+                    });
+                  }}
+                >
+                  <Text style={{ color: item.type, fontSize: 15 }}>
+                    - {item.value}
+                  </Text>
+                </TouchableOpacity>
               )}
             </View>
           </View>

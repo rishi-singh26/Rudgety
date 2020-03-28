@@ -8,6 +8,26 @@ export function findTotal(arr) {
   return total;
 }
 
+export function findTotalExpence(arr) {
+  var total = 0;
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i].type === "#ff2b2b") {
+      total = total + Number(arr[i].value);
+    }
+  }
+  return total;
+}
+
+export function findTotalIncome(arr) {
+  var total = 0;
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i].type === "#28a612") {
+      total = total + Number(arr[i].value);
+    }
+  }
+  return total;
+}
+
 export const retriveData = async key => {
   try {
     const value = await AsyncStorage.getItem(key);

@@ -10,7 +10,12 @@ import {
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ReactNativeParallaxHeader from "react-native-parallax-header";
 import styles from "../Shared/Styles";
-import { findTotal, retriveData, saveData } from "../Shared/functions";
+import {
+  findTotal,
+  retriveData,
+  saveData,
+  findTotalIncome
+} from "../Shared/functions";
 import ActionSheet from "react-native-actionsheet";
 
 const IS_IPHONE_X = SCREEN_HEIGHT === 812 || SCREEN_HEIGHT === 896;
@@ -20,13 +25,7 @@ const NAV_BAR_HEIGHT = HEADER_HEIGHT - STATUS_BAR_HEIGHT;
 const SCREEN_HEIGHT = Math.round(Dimensions.get("window").height);
 const SCREEN_WIDTH = Math.round(Dimensions.get("window").width);
 
-const options = [
-  "Edit the last entry",
-  "Expences",
-  "Income",
-  "About Developer",
-  "Cancel"
-];
+const options = ["Expences", "Income", "About Developer", "Cancel"];
 
 YellowBox.ignoreWarnings([
   "componentWillReceiveProps has been renamed, and is not recommended for use" // TODO: Remove when fixed
@@ -38,9 +37,9 @@ class ExpencesScreen extends Component {
     this.state = {};
   }
 
-  showActionSheet = () => {
-    this.ActionSheet.show();
-  };
+  //   showActionSheet = () => {
+  //     this.ActionSheet.show();
+  //   };
 
   renderNavBar = () => {
     const { data } = this.props.route.params;
@@ -48,8 +47,12 @@ class ExpencesScreen extends Component {
       <View style={styles.navContainer}>
         <View style={styles.statusBar} />
         <View style={styles.navBar}>
-          <Text style={{ color: "#fff", fontSize: 30 }}>Income</Text>
-          <Text style={{ color: "#fff", fontSize: 30 }}>{findTotal(data)}</Text>
+          <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
+            Income
+          </Text>
+          <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
+            {findTotalIncome(data)}
+          </Text>
         </View>
       </View>
     );
@@ -60,45 +63,45 @@ class ExpencesScreen extends Component {
     return (
       <View>
         {/* <StatusBar barStyle="dark-content" /> */}
-        <ActionSheet
+        {/* <ActionSheet
           ref={o => (this.ActionSheet = o)}
           // title={<Text style={{ fontSize: 15 }}>Select your city.</Text>}
           // message="hola"
           options={options}
-          cancelButtonIndex={4}
-          destructiveButtonIndex={4}
+          cancelButtonIndex={3}
+          destructiveButtonIndex={3}
           onPress={index => {
             console.log(index, "pressed");
             console.log(options[index]);
           }}
-        />
+        /> */}
         <View
           style={{
             flex: 1,
             justifyContent: "flex-end",
             alignItems: "center",
             flexDirection: "row",
-            backgroundColor: "transparent"
+            backgroundColor: "transparent",
+            margin: 10
             // marginRight: SCREEN_WIDTH / 20
           }}
         >
           <TouchableOpacity
             style={{ margin: 10 }}
-            // onPress={() => {
-            //   this.props.navigation.navigate("Search", {
-            //     counterList: this.state.taskList,
-            //     deletedCounterList: this.state.deletedTaskList
-            //   });
-            // }}
+            onPress={() => {
+              this.props.navigation.navigate("Search", {
+                data: data
+              });
+            }}
           >
             <Icon name="search" size={25} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{ margin: 10 }}
             onPress={this.showActionSheet}
           >
             <Icon name="more-vert" size={25} color="#000" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         {renderExpences}
       </View>
@@ -124,8 +127,12 @@ class ExpencesScreen extends Component {
             alignItems: "center"
           }}
         >
-          <Text style={{ color: "#fff", fontSize: 40 }}>Income</Text>
-          <Text style={{ color: "#fff", fontSize: 50 }}>{findTotal(data)}</Text>
+          <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
+            Income
+          </Text>
+          <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
+            {findTotalIncome(data)}
+          </Text>
         </View>
       </View>
     );
@@ -138,39 +145,51 @@ class ExpencesScreen extends Component {
       .slice(0)
       .reverse()
       .map((item, index) => {
-        return (
-          <View
-            key={item.id}
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              backgroundColor: "#fff",
-              //   marginBottom: 3,
-              paddingTop: 10,
-              paddingBottom: 10,
-              paddingLeft: 20
-            }}
-          >
-            <View style={{ flex: 5, flexDirection: "column" }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                {item.spentOn}
-              </Text>
-              <Text>{item.desc}</Text>
-            </View>
-            <View style={{ flex: 2, paddingTop: 10 }}>
-              <Text style={{ color: item.type, fontSize: 17 }}>
-                + {item.value}
-              </Text>
-            </View>
-          </View>
-        );
+        if (item.type === "#28a612") {
+          return (
+            <TouchableOpacity
+              key={item.id}
+              onPress={() => {
+                this.props.navigation.navigate("Details", {
+                  data: item
+                });
+              }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  backgroundColor: "#fff",
+                  //   marginBottom: 3,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  paddingLeft: 20
+                }}
+              >
+                <View style={{ flex: 7, flexDirection: "column" }}>
+                  <Text style={{ fontSize: 15, fontWeight: "bold" }}>
+                    {item.spentOn}
+                  </Text>
+                  <Text>{item.desc}</Text>
+                </View>
+                <View style={{ flex: 2, paddingTop: 10 }}>
+                  <Text style={{ color: item.type, fontSize: 15 }}>
+                    + {item.value}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+        } else {
+          return null;
+        }
       });
 
     return (
       <View style={styles.container}>
         <ReactNativeParallaxHeader
           headerMinHeight={HEADER_HEIGHT}
-          headerMaxHeight={300}
+          headerMaxHeight={180}
           extraScrollHeight={20}
           navbarColor="#0088ff"
           title={<this.headerComponent />}
