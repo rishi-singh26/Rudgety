@@ -37,10 +37,6 @@ class ExpencesScreen extends Component {
     this.state = {};
   }
 
-  //   showActionSheet = () => {
-  //     this.ActionSheet.show();
-  //   };
-
   renderNavBar = () => {
     const { data } = this.props.route.params;
     return (
@@ -63,18 +59,6 @@ class ExpencesScreen extends Component {
     return (
       <View>
         {/* <StatusBar barStyle="dark-content" /> */}
-        {/* <ActionSheet
-          ref={o => (this.ActionSheet = o)}
-          // title={<Text style={{ fontSize: 15 }}>Select your city.</Text>}
-          // message="hola"
-          options={options}
-          cancelButtonIndex={3}
-          destructiveButtonIndex={3}
-          onPress={index => {
-            console.log(index, "pressed");
-            console.log(options[index]);
-          }}
-        /> */}
         <View
           style={{
             flex: 1,

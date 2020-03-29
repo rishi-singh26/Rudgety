@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Blank Template",
+    "name": "Rudgety",
     "slug": "Rudgety",
     "privacy": "public",
     "sdkVersion": "36.0.0",
@@ -22,6 +22,10 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
+    },
+    "android": {
+      "package": "com.ravan.rudgety",
+      "versionCode": 1
     }
   }
 }

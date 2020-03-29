@@ -11,7 +11,8 @@ import {
   TouchableHighlight,
   SafeAreaView,
   ScrollView,
-  Alert
+  Alert,
+  Image
 } from "react-native";
 import { SocialIcon, Button } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -46,9 +47,6 @@ const SCREEN_WIDTH = Math.round(Dimensions.get("window").width);
 // .splice(indexOfElementYouWantToDelete, noOfelementsYouWantToDelete)
 const options = ["Edit last entry", "Expences", "Income", "Cancel"];
 
-const images = {
-  background: require("../assets/background.png") // Put your own image here
-};
 class HomeScreen extends Component {
   constructor(props) {
     super(props);
@@ -58,8 +56,6 @@ class HomeScreen extends Component {
       submissionType: true, //this manages the income or expence being submitted, true is income and false is expence
       submissionTypeButtonColor: "#16a10a", //this state manages the background color of the submission type button
       addEntryIconName: "add",
-      expence: [], //this manages the expence data
-      income: [], //this manages the income data
       fullData: [], //this manages the fullData data
       valueErrorMess: "", //thishandles error message for value field of the add entry form
       nameErrorMess: "", //thishandles error message for name field of the add entry form
@@ -77,8 +73,6 @@ class HomeScreen extends Component {
 
   componentDidMount() {
     this.retriveFullData();
-    this.retriveIncomeData();
-    this.retriveExpenceData();
   }
 
   retriveFullData = async () => {
@@ -99,170 +93,177 @@ class HomeScreen extends Component {
     }
   };
 
-  retriveIncomeData = async () => {
-    console.log("Retriving Data");
-    try {
-      const value = await AsyncStorage.getItem("incomeDataKey5");
-      if (value !== null) {
-        // We have data!!
-        var retrivedData = JSON.parse(value);
-        console.log(JSON.parse(retrivedData), "Income Data retrived");
-        console.log(typeof JSON.parse(retrivedData), "type of Data retrived");
-        this.setState({ income: JSON.parse(retrivedData) });
-      }
-    } catch (error) {
-      // Error retrieving data
-      console.log("Error in retriving saved data");
-      return "error";
-    }
-  };
-
-  retriveExpenceData = async () => {
-    console.log("Retriving Data");
-    try {
-      const value = await AsyncStorage.getItem("expenceDataKey5");
-      if (value !== null) {
-        // We have data!!
-        var retrivedData = JSON.parse(value);
-        console.log(JSON.parse(retrivedData), "Expence Data retrived");
-        console.log(typeof JSON.parse(retrivedData), "type of Data retrived");
-        this.setState({ expence: JSON.parse(retrivedData) });
-      }
-    } catch (error) {
-      // Error retrieving data
-      console.log("Error in retriving saved data");
-      return "error";
-    }
-  };
-
   showActionSheet = () => {
     this.ActionSheet.show();
   };
 
-  renderNavBar = () => (
-    <View style={styles.navContainer}>
-      <View style={styles.statusBar} />
-      <View style={styles.navBar}>
-        <Text
-          style={{
-            color: "#fff",
-            fontSize: 30,
-            fontWeight: "bold"
-          }}
-        >
-          Balance: ₹{" "}
-          {findTotalIncome(this.state.fullData) -
-            findTotalExpence(this.state.fullData)}
-        </Text>
-        <TouchableOpacity style={{ margin: 10 }} onPress={this.showActionSheet}>
-          <Icon name="more-vert" size={25} color="#fff" />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  renderNavBar = () => {
+    if (findTotalIncome(this.state.fullData)) {
+      return (
+        <View style={styles.navContainer}>
+          <View style={styles.statusBar} />
+          <View style={styles.navBar}>
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 30,
+                fontWeight: "bold"
+              }}
+            >
+              Balance: ₹{" "}
+              {findTotalIncome(this.state.fullData) -
+                findTotalExpence(this.state.fullData)}
+            </Text>
+            <TouchableOpacity
+              style={{ margin: 10 }}
+              onPress={this.showActionSheet}
+            >
+              <Icon name="more-vert" size={25} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    } else {
+      return (
+        <View style={styles.navContainer}>
+          <View style={styles.navContainer} />
+          <View style={styles.navBar}>
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 30,
+                fontWeight: "bold",
+                paddingBottom: 20
+              }}
+            >
+              Rudgety
+            </Text>
+            <TouchableOpacity
+              style={{ margin: 10 }}
+              onPress={this.showActionSheet}
+            >
+              <Icon name="more-vert" size={25} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    }
+  };
 
   headerComponent = () => {
-    return (
-      <View
-        style={{
-          flex: 1,
-          marginTop: 20
-        }}
-      >
+    console.log(findTotalIncome(this.state.fullData), "total income");
+    console.log(typeof findTotalIncome(this.state.fullData));
+    if (findTotalIncome(this.state.fullData)) {
+      return (
         <View
           style={{
             flex: 1,
-            flexDirection: "column",
-            justifyContent: "center",
-            alignContent: "center",
-            alignItems: "center"
-          }}
-        >
-          <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
-            Balance
-          </Text>
-          <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
-            ₹{" "}
-            {findTotalIncome(this.state.fullData) -
-              findTotalExpence(this.state.fullData)}
-          </Text>
-        </View>
-        <View
-          style={{
-            flex: 2,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            minWidth: (SCREEN_WIDTH / 10) * 4,
-            marginLeft: 20
+            marginTop: 20
           }}
         >
           <View
             style={{
               flex: 1,
+              flexDirection: "column",
               justifyContent: "center",
-              alignContent: "flex-start"
+              alignContent: "center",
+              alignItems: "center"
             }}
           >
-            <TouchableOpacity
-              onPress={() => {
-                if (findTotalExpence(this.state.fullData) > 0) {
-                  this.props.navigation.navigate("Expences", {
-                    data: this.state.fullData
-                  });
-                } else {
-                  alert("No Expences yet!!");
-                }
-              }}
-            >
-              <Text
-                style={{
-                  color: "#fff",
-                  fontSize: 25,
-                  fontWeight: "bold"
-                }}
-              >
-                <Text style={{ color: "red" }}>↑ </Text>
-                <Text style={{ color: "#fff" }}>₹</Text>
-                {findTotalExpence(this.state.fullData)}
-              </Text>
-            </TouchableOpacity>
+            <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
+              Balance
+            </Text>
+            <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
+              ₹{" "}
+              {findTotalIncome(this.state.fullData) -
+                findTotalExpence(this.state.fullData)}
+            </Text>
           </View>
           <View
             style={{
-              flex: 1,
-              justifyContent: "center",
-              alignContent: "flex-end"
+              flex: 2,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              minWidth: (SCREEN_WIDTH / 10) * 4,
+              marginLeft: 20
             }}
           >
-            <TouchableOpacity
-              onPress={() => {
-                if (findTotalIncome(this.state.fullData) > 0) {
-                  this.props.navigation.navigate("Income", {
-                    data: this.state.fullData
-                  });
-                } else {
-                  alert("No Income Yet!!");
-                }
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignContent: "flex-start"
               }}
             >
-              <Text
-                style={{
-                  color: "#fff",
-                  fontSize: 25,
-                  fontWeight: "bold",
-                  marginLeft: 30
+              <TouchableOpacity
+                onPress={() => {
+                  if (findTotalExpence(this.state.fullData) > 0) {
+                    this.props.navigation.navigate("Expences", {
+                      data: this.state.fullData
+                    });
+                  } else {
+                    alert("No Expences yet!!");
+                  }
                 }}
               >
-                <Text style={{ color: "#19ff25" }}>↓ </Text>
-                <Text style={{ color: "#fff" }}>₹</Text>
-                {findTotalIncome(this.state.fullData)}
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: 25,
+                    fontWeight: "bold"
+                  }}
+                >
+                  <Text style={{ color: "red" }}>↑ </Text>
+                  <Text style={{ color: "#fff" }}>₹</Text>
+                  {findTotalExpence(this.state.fullData)}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignContent: "flex-end"
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  if (findTotalIncome(this.state.fullData) > 0) {
+                    this.props.navigation.navigate("Income", {
+                      data: this.state.fullData
+                    });
+                  } else {
+                    alert("No Income Yet!!");
+                  }
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: 25,
+                    fontWeight: "bold",
+                    marginLeft: 30
+                  }}
+                >
+                  <Text style={{ color: "#19ff25" }}>↓ </Text>
+                  <Text style={{ color: "#fff" }}>₹</Text>
+                  {findTotalIncome(this.state.fullData)}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-    );
+      );
+    } else {
+      return (
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <Text style={{ color: "#fff", fontSize: 40, fontWeight: "bold" }}>
+            Rudgety
+          </Text>
+        </View>
+      );
+    }
   };
 
   fieldRef = React.createRef();
@@ -271,8 +272,6 @@ class HomeScreen extends Component {
 
   onSubmit = () => {
     var currentFullData = this.state.fullData;
-    var currentExpenceData = this.state.expence;
-    var currentIncomeData = this.state.income;
 
     let { current: field } = this.fieldRef;
     let { current: field2 } = this.fieldRef1;
@@ -322,28 +321,15 @@ class HomeScreen extends Component {
           spentOn: field2.value()
         };
         var newFullData = currentFullData.concat(newData);
-        var newtExpenceData = currentExpenceData.concat(newData);
-        var newIncomeData = currentIncomeData.concat(newData);
 
         var currentBalance =
-          findTotal(newIncomeData) - findTotal(newtExpenceData);
+          findTotalIncome(newFullData) - findTotalExpence(newFullData);
 
         if (currentBalance > 0 || currentFullData.length === 0) {
           this.setState({ fullData: newFullData });
         }
         saveData(this.state.fullDataKey, JSON.stringify(newFullData));
 
-        if (this.state.submissionType) {
-          this.setState({ income: newIncomeData });
-          saveData("incomeDataKey5", JSON.stringify(newIncomeData));
-        } else {
-          if (currentBalance > 0) {
-            this.setState({ expence: newtExpenceData });
-            saveData("expenceDataKey5", JSON.stringify(newtExpenceData));
-          } else {
-            alert("Your balance is 0.");
-          }
-        }
         this.setState({ showInput: !this.state.showInput });
         if (this.state.addEntryIconName === "add") {
           this.setState({ addEntryIconName: "undo" });
@@ -599,6 +585,38 @@ class HomeScreen extends Component {
               bold={true}
             />
           </Dialog.Container>
+        )}
+        {this.state.fullData && (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 30
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({ showInput: !this.state.showInput });
+                if (this.state.showInput) {
+                  this.setState({ addEntryIconName: "add" });
+                } else {
+                  this.setState({ addEntryIconName: "undo" });
+                }
+                this.setState({
+                  valueErrorMess: "",
+                  nameErrorMess: "",
+                  descErrorMess: "",
+                  submitEntryBtnBackgroundColor: "#0088ff",
+                  submitEntryBtnTitle: "Submit"
+                });
+              }}
+            >
+              <Image
+                style={{ width: 200, height: 200 }}
+                source={require("../assets/add.png")}
+              />
+            </TouchableOpacity>
+          </View>
         )}
       </View>
     );
