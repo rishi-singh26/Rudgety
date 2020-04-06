@@ -28,6 +28,7 @@ import {
 import ActionSheet from "react-native-actionsheet";
 import { OutlinedTextField } from "react-native-material-textfield";
 import Dialog from "react-native-dialog";
+import SwipeablePanel from "rn-swipeable-panel";
 
 var today = new Date();
 var date =
@@ -67,13 +68,23 @@ class HomeScreen extends Component {
       newName: "", //this manages the new name while editing the last entry
       newDescription: "", //this manages the new description while editing the last entry
       editEntryType: "Income ▼", //this manages the type of entry while editing the last entry
-      fullDataKey: "fullDataKey1" //this manages the storage key for the full data
+      fullDataKey: "fullDataKey1", //this manages the storage key for the full data
+      swipeablePanelActive: false, //this state manages the swipable bottem panel
+      swipablePnaelData: "" //this state manages the data in swipable panel
     };
   }
 
   componentDidMount() {
     this.retriveFullData();
   }
+
+  openPanel = () => {
+    this.setState({ swipeablePanelActive: true });
+  };
+
+  closePanel = () => {
+    this.setState({ swipeablePanelActive: false });
+  };
 
   retriveFullData = async () => {
     console.log("Retriving Data");
@@ -352,6 +363,95 @@ class HomeScreen extends Component {
     return (
       <View>
         {/* <StatusBar barStyle="light-content" /> */}
+        <SwipeablePanel
+          fullWidth
+          isActive={this.state.swipeablePanelActive}
+          onClose={this.closePanel}
+          onPressCloseButton={this.closePanel}
+          showCloseButton={false}
+          fullWidth={true}
+          openLarge={false}
+          onlyLarge={false}
+          noBackgroundOpacity={true}
+          style={{ backgroundColor: "#f0f0f0" }}
+          closeOnTouchOutside={true}
+          // noBar={true}
+        >
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 20
+            }}
+          >
+            {this.state.swipablePnaelData.type === "#28a612" && (
+              <View
+                style={{
+                  backgroundColor: this.state.swipablePnaelData.type,
+                  minWidth: 60,
+                  minHeight: 60,
+                  borderRadius: 50,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <Icon name="check" reverse size={25} color="#fff" />
+              </View>
+            )}
+            {this.state.swipablePnaelData.type === "#ff2b2b" && (
+              <View
+                style={{
+                  backgroundColor: this.state.swipablePnaelData.type,
+                  minWidth: 60,
+                  minHeight: 60,
+                  borderRadius: 50,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <Icon name="clear" reverse size={25} color="#fff" />
+              </View>
+            )}
+
+            <Text
+              style={{
+                fontSize: 40,
+                fontWeight: "bold",
+                minHeight: 60
+              }}
+            >
+              {this.state.swipablePnaelData.spentOn}
+            </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                color: this.state.swipablePnaelData.type,
+                minHeight: 30
+              }}
+            >
+              {this.state.swipablePnaelData.desc}
+            </Text>
+            <Text
+              style={{
+                fontSize: 30,
+                fontWeight: "bold",
+                color: this.state.swipablePnaelData.type,
+                minHeight: 70
+              }}
+            >
+              ₹ {this.state.swipablePnaelData.value}
+            </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "bold"
+              }}
+            >
+              {this.state.swipablePnaelData.date}
+            </Text>
+          </View>
+        </SwipeablePanel>
         <ActionSheet
           ref={o => (this.ActionSheet = o)}
           options={options}
@@ -418,6 +518,7 @@ class HomeScreen extends Component {
           >
             <Icon name={this.state.addEntryIconName} size={27} color="#000" />
           </TouchableOpacity>
+
           <TouchableOpacity
             style={{ margin: 10 }}
             onPress={() => {
@@ -586,7 +687,7 @@ class HomeScreen extends Component {
             />
           </Dialog.Container>
         )}
-        {this.state.fullData && (
+        {this.state.fullData.length === 0 && !this.state.showInput && (
           <View
             style={{
               justifyContent: "center",
@@ -672,9 +773,8 @@ class HomeScreen extends Component {
               <View style={{ flex: 7 }}>
                 <TouchableOpacity
                   onPress={() => {
-                    this.props.navigation.navigate("Details", {
-                      data: item
-                    });
+                    this.setState({ swipablePnaelData: item });
+                    this.setState({ swipeablePanelActive: true });
                   }}
                 >
                   <View
