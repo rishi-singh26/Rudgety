@@ -12,7 +12,8 @@ import {
   SafeAreaView,
   ScrollView,
   Alert,
-  Image
+  Image,
+  BackHandler,
 } from "react-native";
 import { SocialIcon, Button } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -23,7 +24,7 @@ import {
   retriveData,
   saveData,
   findTotalExpence,
-  findTotalIncome
+  findTotalIncome,
 } from "../Shared/functions";
 import ActionSheet from "react-native-actionsheet";
 import { OutlinedTextField } from "react-native-material-textfield";
@@ -70,12 +71,45 @@ class HomeScreen extends Component {
       editEntryType: "Income ▼", //this manages the type of entry while editing the last entry
       fullDataKey: "fullDataKey1", //this manages the storage key for the full data
       swipeablePanelActive: false, //this state manages the swipable bottem panel
-      swipablePnaelData: "" //this state manages the data in swipable panel
+      swipablePnaelData: "", //this state manages the data in swipable panel
+      swipablePnaelIndex: "", //this state manages th eindex of the data in the swipable panel
     };
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
 
   componentDidMount() {
     this.retriveFullData();
+    // This is the first method in the activity lifecycle
+    // Addding Event Listener for the BackPress
+    BackHandler.addEventListener(
+      "hardwareBackPress",
+      this.handleBackButtonClick
+    );
+    console.log("Component did mount");
+  }
+
+  componentWillUnmount() {
+    // This is the Last method in the activity lifecycle
+    // Removing Event Listener for the BackPress
+    BackHandler.removeEventListener(
+      "hardwareBackPress",
+      this.handleBackButtonClick
+    );
+    console.log("Component will unmount");
+  }
+
+  handleBackButtonClick() {
+    if (this.state.showInput) {
+      this.setState({ showInput: !this.state.showInput });
+    } else if (this.state.swipeablePanelActive) {
+      this.setState({ swipeablePanelActive: !this.state.swipeablePanelActive });
+    } else {
+      BackHandler.exitApp();
+    }
+    // We can move to any screen. If we want
+    // Returning true means we have handled the backpress
+    // Returning false means we haven't handled the backpress
+    return true;
   }
 
   openPanel = () => {
@@ -118,7 +152,7 @@ class HomeScreen extends Component {
               style={{
                 color: "#fff",
                 fontSize: 30,
-                fontWeight: "bold"
+                fontWeight: "bold",
               }}
             >
               Balance: ₹{" "}
@@ -144,7 +178,7 @@ class HomeScreen extends Component {
                 color: "#fff",
                 fontSize: 30,
                 fontWeight: "bold",
-                paddingBottom: 20
+                paddingBottom: 20,
               }}
             >
               Rudgety
@@ -169,7 +203,7 @@ class HomeScreen extends Component {
         <View
           style={{
             flex: 1,
-            marginTop: 20
+            marginTop: 20,
           }}
         >
           <View
@@ -178,7 +212,7 @@ class HomeScreen extends Component {
               flexDirection: "column",
               justifyContent: "center",
               alignContent: "center",
-              alignItems: "center"
+              alignItems: "center",
             }}
           >
             <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
@@ -197,21 +231,21 @@ class HomeScreen extends Component {
               justifyContent: "space-between",
               alignItems: "center",
               minWidth: (SCREEN_WIDTH / 10) * 4,
-              marginLeft: 20
+              marginLeft: 20,
             }}
           >
             <View
               style={{
                 flex: 1,
                 justifyContent: "center",
-                alignContent: "flex-start"
+                alignContent: "flex-start",
               }}
             >
               <TouchableOpacity
                 onPress={() => {
                   if (findTotalExpence(this.state.fullData) > 0) {
                     this.props.navigation.navigate("Expences", {
-                      data: this.state.fullData
+                      data: this.state.fullData,
                     });
                   } else {
                     alert("No Expences yet!!");
@@ -222,7 +256,7 @@ class HomeScreen extends Component {
                   style={{
                     color: "#fff",
                     fontSize: 25,
-                    fontWeight: "bold"
+                    fontWeight: "bold",
                   }}
                 >
                   <Text style={{ color: "red" }}>↑ </Text>
@@ -235,14 +269,14 @@ class HomeScreen extends Component {
               style={{
                 flex: 1,
                 justifyContent: "center",
-                alignContent: "flex-end"
+                alignContent: "flex-end",
               }}
             >
               <TouchableOpacity
                 onPress={() => {
                   if (findTotalIncome(this.state.fullData) > 0) {
                     this.props.navigation.navigate("Income", {
-                      data: this.state.fullData
+                      data: this.state.fullData,
                     });
                   } else {
                     alert("No Income Yet!!");
@@ -254,7 +288,7 @@ class HomeScreen extends Component {
                     color: "#fff",
                     fontSize: 25,
                     fontWeight: "bold",
-                    marginLeft: 30
+                    marginLeft: 30,
                   }}
                 >
                   <Text style={{ color: "#19ff25" }}>↓ </Text>
@@ -329,7 +363,7 @@ class HomeScreen extends Component {
           date: date,
           desc: field3.value(),
           type: typeOfData,
-          spentOn: field2.value()
+          spentOn: field2.value(),
         };
         var newFullData = currentFullData.concat(newData);
 
@@ -354,7 +388,7 @@ class HomeScreen extends Component {
     } else {
       this.setState({
         submitEntryBtnBackgroundColor: "#f00",
-        submitEntryBtnTitle: "Please enter the details and submit"
+        submitEntryBtnTitle: "Please enter the details and submit",
       });
     }
   };
@@ -381,7 +415,8 @@ class HomeScreen extends Component {
             style={{
               justifyContent: "center",
               alignItems: "center",
-              marginTop: 20
+              marginTop: 0,
+              // minHeight: SCREEN_HEIGHT,
             }}
           >
             {this.state.swipablePnaelData.type === "#28a612" && (
@@ -392,7 +427,7 @@ class HomeScreen extends Component {
                   minHeight: 60,
                   borderRadius: 50,
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <Icon name="check" reverse size={25} color="#fff" />
@@ -406,7 +441,7 @@ class HomeScreen extends Component {
                   minHeight: 60,
                   borderRadius: 50,
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <Icon name="clear" reverse size={25} color="#fff" />
@@ -415,9 +450,11 @@ class HomeScreen extends Component {
 
             <Text
               style={{
-                fontSize: 40,
+                fontSize: 27,
                 fontWeight: "bold",
-                minHeight: 60
+                minHeight: 60,
+                marginLeft: SCREEN_WIDTH / 11,
+                marginRight: SCREEN_WIDTH / 11,
               }}
             >
               {this.state.swipablePnaelData.spentOn}
@@ -427,7 +464,9 @@ class HomeScreen extends Component {
                 fontSize: 20,
                 fontWeight: "bold",
                 color: this.state.swipablePnaelData.type,
-                minHeight: 30
+                minHeight: 30,
+                marginLeft: SCREEN_WIDTH / 9,
+                marginRight: SCREEN_WIDTH / 9,
               }}
             >
               {this.state.swipablePnaelData.desc}
@@ -437,7 +476,7 @@ class HomeScreen extends Component {
                 fontSize: 30,
                 fontWeight: "bold",
                 color: this.state.swipablePnaelData.type,
-                minHeight: 70
+                minHeight: 70,
               }}
             >
               ₹ {this.state.swipablePnaelData.value}
@@ -445,7 +484,7 @@ class HomeScreen extends Component {
             <Text
               style={{
                 fontSize: 20,
-                fontWeight: "bold"
+                fontWeight: "bold",
               }}
             >
               {this.state.swipablePnaelData.date}
@@ -453,17 +492,17 @@ class HomeScreen extends Component {
           </View>
         </SwipeablePanel>
         <ActionSheet
-          ref={o => (this.ActionSheet = o)}
+          ref={(o) => (this.ActionSheet = o)}
           options={options}
           cancelButtonIndex={3}
           destructiveButtonIndex={3}
-          onPress={index => {
+          onPress={(index) => {
             console.log(index, "pressed");
             console.log(options[index]);
             if (index === 0) {
               if (this.state.fullData.length > 0) {
                 this.setState({
-                  editLastEntryViewVisible: true
+                  editLastEntryViewVisible: true,
                 });
               } else {
                 alert("Make an entry first!!");
@@ -471,7 +510,7 @@ class HomeScreen extends Component {
             } else if (index === 1) {
               if (findTotalExpence(this.state.fullData) > 0) {
                 this.props.navigation.navigate("Expences", {
-                  data: this.state.fullData
+                  data: this.state.fullData,
                 });
               } else {
                 alert("No Expences yet!!");
@@ -479,7 +518,7 @@ class HomeScreen extends Component {
             } else if (index === 2) {
               if (findTotalIncome(this.state.fullData) > 0) {
                 this.props.navigation.navigate("Income", {
-                  data: this.state.fullData
+                  data: this.state.fullData,
                 });
               } else {
                 alert("No Income yet!!");
@@ -495,7 +534,7 @@ class HomeScreen extends Component {
             flexDirection: "row",
             backgroundColor: "transparent",
             marginTop: 10,
-            marginRight: SCREEN_WIDTH / 50
+            marginRight: SCREEN_WIDTH / 50,
           }}
         >
           <TouchableOpacity
@@ -512,7 +551,7 @@ class HomeScreen extends Component {
                 nameErrorMess: "",
                 descErrorMess: "",
                 submitEntryBtnBackgroundColor: "#0088ff",
-                submitEntryBtnTitle: "Submit"
+                submitEntryBtnTitle: "Submit",
               });
             }}
           >
@@ -523,7 +562,7 @@ class HomeScreen extends Component {
             style={{ margin: 10 }}
             onPress={() => {
               this.props.navigation.navigate("Search", {
-                data: this.state.fullData
+                data: this.state.fullData,
               });
             }}
           >
@@ -541,8 +580,8 @@ class HomeScreen extends Component {
             style={[
               {
                 padding: 10,
-                margin: 10
-              }
+                margin: 10,
+              },
             ]}
           >
             <Text>Make a new entry here.</Text>
@@ -566,18 +605,18 @@ class HomeScreen extends Component {
                       this.setState({
                         submissionType: !this.state.submissionType,
                         submissionTypeButtonColor: "#ff3b3b",
-                        submissionTypeButtonTitle: "↑"
+                        submissionTypeButtonTitle: "↑",
                       });
                     } else {
                       this.setState({
                         submissionType: !this.state.submissionType,
                         submissionTypeButtonColor: "#16a10a",
-                        submissionTypeButtonTitle: "↓"
+                        submissionTypeButtonTitle: "↓",
                       });
                     }
                   }}
                   buttonStyle={{
-                    backgroundColor: this.state.submissionTypeButtonColor
+                    backgroundColor: this.state.submissionTypeButtonColor,
                   }}
                   titleStyle={{ fontSize: 26, fontWeight: "bold" }}
                 />
@@ -604,7 +643,7 @@ class HomeScreen extends Component {
               title={this.state.submitEntryBtnTitle}
               onPress={this.onSubmit}
               buttonStyle={{
-                backgroundColor: this.state.submitEntryBtnBackgroundColor
+                backgroundColor: this.state.submitEntryBtnBackgroundColor,
               }}
             />
             <Text style={{ minHeight: 400 }}></Text>
@@ -625,10 +664,10 @@ class HomeScreen extends Component {
                 borderColor: "gray",
                 borderWidth: 1,
                 borderRadius: 5,
-                padding: 5
+                padding: 5,
               }}
               keyboardType="number-pad"
-              onChangeText={text => this.setState({ newValue: text })}
+              onChangeText={(text) => this.setState({ newValue: text })}
               value={this.state.newValue}
             ></Dialog.Input>
             <Dialog.Input
@@ -637,10 +676,10 @@ class HomeScreen extends Component {
                 borderColor: "gray",
                 borderWidth: 1,
                 borderRadius: 5,
-                padding: 5
+                padding: 5,
               }}
               keyboardType="default"
-              onChangeText={text => this.setState({ newName: text })}
+              onChangeText={(text) => this.setState({ newName: text })}
               value={this.state.newName}
             ></Dialog.Input>
             <Dialog.Input
@@ -649,10 +688,10 @@ class HomeScreen extends Component {
                 borderColor: "gray",
                 borderWidth: 1,
                 borderRadius: 5,
-                padding: 5
+                padding: 5,
               }}
               keyboardType="default"
-              onChangeText={text => this.setState({ newDescription: text })}
+              onChangeText={(text) => this.setState({ newDescription: text })}
               value={this.state.newDescription}
             ></Dialog.Input>
             <Dialog.Button
@@ -661,12 +700,12 @@ class HomeScreen extends Component {
                 if (this.state.editEntryType === "Income ▼") {
                   this.setState({
                     editEntryType: "Expence ▼",
-                    submissionTypeButtonColor: "#ff3b3b"
+                    submissionTypeButtonColor: "#ff3b3b",
                   });
                 } else if (this.state.editEntryType === "Expence ▼") {
                   this.setState({
                     editEntryType: "Income ▼",
-                    submissionTypeButtonColor: "#16a10a"
+                    submissionTypeButtonColor: "#16a10a",
                   });
                 }
               }}
@@ -692,7 +731,7 @@ class HomeScreen extends Component {
             style={{
               justifyContent: "center",
               alignItems: "center",
-              marginTop: 30
+              marginTop: 30,
             }}
           >
             <TouchableOpacity
@@ -708,7 +747,7 @@ class HomeScreen extends Component {
                   nameErrorMess: "",
                   descErrorMess: "",
                   submitEntryBtnBackgroundColor: "#0088ff",
-                  submitEntryBtnTitle: "Submit"
+                  submitEntryBtnTitle: "Submit",
                 });
               }}
             >
@@ -750,7 +789,7 @@ class HomeScreen extends Component {
         date: date,
         desc: this.state.newDescription,
         type: typeOfData,
-        spentOn: this.state.newName
+        spentOn: this.state.newName,
       };
       var poppedCurrentData = curreentData.pop();
       var newFullData = curreentData.concat(newData);
@@ -773,7 +812,10 @@ class HomeScreen extends Component {
               <View style={{ flex: 7 }}>
                 <TouchableOpacity
                   onPress={() => {
-                    this.setState({ swipablePnaelData: item });
+                    this.setState({
+                      swipablePnaelData: item,
+                      swipablePnaelIndex: index,
+                    });
                     this.setState({ swipeablePanelActive: true });
                   }}
                 >
@@ -785,14 +827,14 @@ class HomeScreen extends Component {
                       //   marginBottom: 3,
                       paddingTop: 10,
                       paddingBottom: 10,
-                      paddingLeft: 20
+                      paddingLeft: 20,
                     }}
                   >
                     <View style={{ flex: 7, flexDirection: "column" }}>
                       <Text style={{ fontSize: 15, fontWeight: "bold" }}>
                         {item.spentOn}
                       </Text>
-                      <Text>{item.desc}</Text>
+                      <Text>{item.date}</Text>
                     </View>
 
                     <View style={{ flex: 2, paddingTop: 10 }}>
@@ -821,7 +863,7 @@ class HomeScreen extends Component {
                         {
                           text: "Cancel",
                           onPress: () => console.log("Cancel Pressed"),
-                          style: "cancel"
+                          style: "cancel",
                         },
                         {
                           text: "OK",
@@ -838,8 +880,8 @@ class HomeScreen extends Component {
                               this.state.fullDataKey,
                               JSON.stringify(currentFullData)
                             );
-                          }
-                        }
+                          },
+                        },
                       ],
                       { cancelable: false }
                     );
@@ -874,7 +916,7 @@ class HomeScreen extends Component {
           innerContainerStyle={styles.container}
           scrollViewProps={{
             onScrollBeginDrag: () => console.log("onScrollBeginDrag"),
-            onScrollEndDrag: () => console.log("onScrollEndDrag")
+            onScrollEndDrag: () => console.log("onScrollEndDrag"),
           }}
           alwaysShowTitle={false}
           alwaysShowNavBar={false}

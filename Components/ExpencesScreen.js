@@ -5,7 +5,8 @@ import {
   Dimensions,
   TouchableOpacity,
   StatusBar,
-  YellowBox
+  YellowBox,
+  BackHandler,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ReactNativeParallaxHeader from "react-native-parallax-header";
@@ -14,9 +15,10 @@ import {
   findTotal,
   retriveData,
   saveData,
-  findTotalExpence
+  findTotalExpence,
 } from "../Shared/functions";
-import ActionSheet from "react-native-actionsheet";
+// import ActionSheet from "react-native-actionsheet";
+import SwipeablePanel from "rn-swipeable-panel";
 
 const IS_IPHONE_X = SCREEN_HEIGHT === 812 || SCREEN_HEIGHT === 896;
 const STATUS_BAR_HEIGHT = Platform.OS === "ios" ? (IS_IPHONE_X ? 44 : 20) : 0;
@@ -28,18 +30,53 @@ const SCREEN_WIDTH = Math.round(Dimensions.get("window").width);
 const options = ["Expences", "Income", "About Developer", "Cancel"];
 
 YellowBox.ignoreWarnings([
-  "componentWillReceiveProps has been renamed, and is not recommended for use" // TODO: Remove when fixed
+  "componentWillReceiveProps has been renamed, and is not recommended for use", // TODO: Remove when fixed
 ]);
+
+var renderExpences = "";
 
 class ExpencesScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      swipeablePanelActive: false,
+      swipablePnaelData: "",
+      swipablePnaelIndex: "",
+    };
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
 
-  // showActionSheet = () => {
-  //   this.ActionSheet.show();
-  // };
+  componentDidMount() {
+    // This is the first method in the activity lifecycle
+    // Addding Event Listener for the BackPress
+    BackHandler.addEventListener(
+      "hardwareBackPress",
+      this.handleBackButtonClick
+    );
+    console.log("Component did mount");
+  }
+
+  componentWillUnmount() {
+    // This is the Last method in the activity lifecycle
+    // Removing Event Listener for the BackPress
+    BackHandler.removeEventListener(
+      "hardwareBackPress",
+      this.handleBackButtonClick
+    );
+    console.log("Component will unmount");
+  }
+
+  handleBackButtonClick() {
+    if (this.state.swipeablePanelActive) {
+      this.setState({ swipeablePanelActive: !this.state.swipeablePanelActive });
+    } else {
+      this.props.navigation.navigate("Home");
+    }
+    // We can move to any screen. If we want
+    // Returning true means we have handled the backpress
+    // Returning false means we haven't handled the backpress
+    return true;
+  }
 
   renderNavBar = () => {
     const { data } = this.props.route.params;
@@ -58,23 +95,103 @@ class ExpencesScreen extends Component {
     );
   };
 
+  closePanel = () => {
+    this.setState({ swipeablePanelActive: false });
+  };
+
   renderContent = () => {
     const { data } = this.props.route.params;
     return (
       <View>
-        {/* <StatusBar barStyle="dark-content" /> */}
-        {/* <ActionSheet
-          ref={o => (this.ActionSheet = o)}
-          // title={<Text style={{ fontSize: 15 }}>Select your city.</Text>}
-          // message="hola"
-          options={options}
-          cancelButtonIndex={3}
-          destructiveButtonIndex={3}
-          onPress={index => {
-            console.log(index, "pressed");
-            console.log(options[index]);
-          }}
-        /> */}
+        <SwipeablePanel
+          fullWidth
+          isActive={this.state.swipeablePanelActive}
+          onClose={this.closePanel}
+          onPressCloseButton={this.closePanel}
+          showCloseButton={false}
+          fullWidth={true}
+          openLarge={false}
+          onlyLarge={false}
+          noBackgroundOpacity={true}
+          style={{ backgroundColor: "#f0f0f0" }}
+          closeOnTouchOutside={true}
+          // noBar={true}
+        >
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 20,
+            }}
+          >
+            {this.state.swipablePnaelData.type === "#28a612" && (
+              <View
+                style={{
+                  backgroundColor: this.state.swipablePnaelData.type,
+                  minWidth: 60,
+                  minHeight: 60,
+                  borderRadius: 50,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Icon name="check" reverse size={25} color="#fff" />
+              </View>
+            )}
+            {this.state.swipablePnaelData.type === "#ff2b2b" && (
+              <View
+                style={{
+                  backgroundColor: this.state.swipablePnaelData.type,
+                  minWidth: 60,
+                  minHeight: 60,
+                  borderRadius: 50,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Icon name="clear" reverse size={25} color="#fff" />
+              </View>
+            )}
+
+            <Text
+              style={{
+                fontSize: 40,
+                fontWeight: "bold",
+                minHeight: 60,
+              }}
+            >
+              {this.state.swipablePnaelData.spentOn}
+            </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                color: this.state.swipablePnaelData.type,
+                minHeight: 30,
+              }}
+            >
+              {this.state.swipablePnaelData.desc}
+            </Text>
+            <Text
+              style={{
+                fontSize: 30,
+                fontWeight: "bold",
+                color: this.state.swipablePnaelData.type,
+                minHeight: 70,
+              }}
+            >
+              ₹ {this.state.swipablePnaelData.value}
+            </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+              }}
+            >
+              {this.state.swipablePnaelData.date}
+            </Text>
+          </View>
+        </SwipeablePanel>
         <View
           style={{
             flex: 1,
@@ -82,7 +199,7 @@ class ExpencesScreen extends Component {
             alignItems: "center",
             flexDirection: "row",
             backgroundColor: "transparent",
-            margin: 10
+            margin: 10,
             // marginRight: SCREEN_WIDTH / 20
           }}
         >
@@ -90,18 +207,12 @@ class ExpencesScreen extends Component {
             style={{ margin: 10 }}
             onPress={() => {
               this.props.navigation.navigate("Search", {
-                data: data
+                data: data,
               });
             }}
           >
             <Icon name="search" size={25} color="#000" />
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            style={{ margin: 10 }}
-            onPress={this.showActionSheet}
-          >
-            <Icon name="more-vert" size={25} color="#000" />
-          </TouchableOpacity> */}
         </View>
         {renderExpences}
       </View>
@@ -114,7 +225,7 @@ class ExpencesScreen extends Component {
       <View
         style={{
           flex: 1,
-          marginTop: 20
+          marginTop: 20,
         }}
       >
         <View
@@ -124,7 +235,7 @@ class ExpencesScreen extends Component {
             marginTop: 10,
             justifyContent: "center",
             alignContent: "center",
-            alignItems: "center"
+            alignItems: "center",
           }}
         >
           <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
@@ -150,9 +261,11 @@ class ExpencesScreen extends Component {
             <TouchableOpacity
               key={item.id}
               onPress={() => {
-                this.props.navigation.navigate("Details", {
-                  data: item
+                this.setState({
+                  swipablePnaelData: item,
+                  swipablePnaelIndex: index,
                 });
+                this.setState({ swipeablePanelActive: true });
               }}
             >
               <View
@@ -163,7 +276,7 @@ class ExpencesScreen extends Component {
                   //   marginBottom: 3,
                   paddingTop: 10,
                   paddingBottom: 10,
-                  paddingLeft: 20
+                  paddingLeft: 20,
                 }}
               >
                 <View style={{ flex: 7, flexDirection: "column" }}>
@@ -204,7 +317,7 @@ class ExpencesScreen extends Component {
           innerContainerStyle={styles.container}
           scrollViewProps={{
             onScrollBeginDrag: () => console.log("onScrollBeginDrag"),
-            onScrollEndDrag: () => console.log("onScrollEndDrag")
+            onScrollEndDrag: () => console.log("onScrollEndDrag"),
           }}
           alwaysShowTitle={false}
           alwaysShowNavBar={false}
