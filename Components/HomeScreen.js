@@ -101,6 +101,11 @@ class HomeScreen extends Component {
   handleBackButtonClick() {
     if (this.state.showInput) {
       this.setState({ showInput: !this.state.showInput });
+      if (this.state.addEntryIconName === "add") {
+        this.setState({ addEntryIconName: "undo" });
+      } else {
+        this.setState({ addEntryIconName: "add" });
+      }
     } else if (this.state.swipeablePanelActive) {
       this.setState({ swipeablePanelActive: !this.state.swipeablePanelActive });
     } else {
